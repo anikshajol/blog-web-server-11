@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const moment = require("moment");
 require("dotenv").config();
 
 // middleware
@@ -30,7 +29,7 @@ async function run() {
     // await client.connect();
 
     const blogsCollection = client.db("blogsDB").collection("blogs");
-    const commentsCollection = client.db("commentsDB").collection("comments");
+    const commentsCollection = client.db("blogsDB").collection("comments");
 
     // get method
     app.get("/blogs/recent-post", async (req, res) => {
@@ -42,18 +41,29 @@ async function run() {
           .toArray();
 
         res.send(result);
-      } catch {
-        (err) => {
-          console.log(err);
-        };
+      } catch (error) {
+        console.log(error);
       }
     });
 
     app.get("/blogs/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await blogsCollection.findOne(query);
-      res.send(result);
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await blogsCollection.findOne(query);
+        res.send(result);
+      } catch {}
+    });
+
+    // get comments
+
+    app.get("/comments", async (req, res) => {
+      try {
+        const result = await commentsCollection.find().toArray();
+        res.send(result);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // post method
