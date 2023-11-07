@@ -30,6 +30,7 @@ async function run() {
     // await client.connect();
 
     const blogsCollection = client.db("blogsDB").collection("blogs");
+    const commentsCollection = client.db("commentsDB").collection("comments");
 
     // get method
     app.get("/blogs/recent-post", async (req, res) => {
@@ -63,10 +64,20 @@ async function run() {
         console.log(newBlogs);
         const result = await blogsCollection.insertOne(newBlogs);
         res.send(result);
-      } catch {
-        (err) => {
-          console.log(err);
-        };
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // post method comments
+
+    app.post("/comments", async (req, res) => {
+      try {
+        const newComments = req.body;
+        const result = await commentsCollection.insertOne(newComments);
+        res.send(result);
+      } catch (error) {
+        console.error(error);
       }
     });
 
