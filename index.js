@@ -32,7 +32,6 @@ async function run() {
     const blogsCollection = client.db("blogsDB").collection("blogs");
 
     // get method
-
     app.get("/blogs/recent-post", async (req, res) => {
       try {
         const result = await blogsCollection
@@ -50,6 +49,19 @@ async function run() {
     });
 
     // post method
+
+    app.post("/blogs", async (req, res) => {
+      try {
+        const newBlogs = req.body;
+        console.log(newBlogs);
+        const result = await blogsCollection.insertOne(newBlogs);
+        res.send(result);
+      } catch {
+        (err) => {
+          console.log(err);
+        };
+      }
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
