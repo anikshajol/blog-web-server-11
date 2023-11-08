@@ -30,6 +30,8 @@ async function run() {
 
     const blogsCollection = client.db("blogsDB").collection("blogs");
     const commentsCollection = client.db("blogsDB").collection("comments");
+    const categoryCollection = client.db("blogsDB").collection("categories");
+    const wishListCollection = client.db("blogsDB").collection("wishList");
 
     // get method
 
@@ -41,6 +43,8 @@ async function run() {
         console.error(error);
       }
     });
+
+    //
 
     app.get("/blogs/recent-post", async (req, res) => {
       try {
@@ -66,9 +70,24 @@ async function run() {
     });
     app.get("/categories", async (req, res) => {
       try {
-        const result = await blogsCollection.find().toArray();
+        const result = await categoryCollection.find().toArray();
         res.send(result);
       } catch {}
+    });
+
+    // get wishlist
+
+    app.get("/wishlist", async (req, res) => {
+      try {
+        let query = {};
+        if (req.query?.email) {
+          query = { email: req.query.email };
+        }
+        const result = await wishListCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // get comments
@@ -100,6 +119,17 @@ async function run() {
         const newBlogs = req.body;
         console.log(newBlogs);
         const result = await blogsCollection.insertOne(newBlogs);
+        res.send(result);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    app.post("/wishlist", async (req, res) => {
+      try {
+        const newWishList = req.body;
+        const result = await wishListCollection.insertOne(newWishList);
+        console.log(result);
         res.send(result);
       } catch (error) {
         console.log(error);
