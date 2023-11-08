@@ -128,6 +128,7 @@ async function run() {
     app.post("/wishlist", async (req, res) => {
       try {
         const newWishList = req.body;
+
         const result = await wishListCollection.insertOne(newWishList);
         console.log(result);
         res.send(result);
@@ -162,6 +163,15 @@ async function run() {
       const option = { upsert: true };
       const result = await blogsCollection.updateOne(id, updateData, option);
       console.log(body);
+      res.send(result);
+    });
+
+    // delete method;
+
+    app.delete("/wishlist/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await wishListCollection.deleteOne(query);
       res.send(result);
     });
 
