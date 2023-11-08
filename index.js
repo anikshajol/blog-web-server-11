@@ -32,6 +32,16 @@ async function run() {
     const commentsCollection = client.db("blogsDB").collection("comments");
 
     // get method
+
+    app.get("/blogs", async (req, res) => {
+      try {
+        const result = await blogsCollection.find().toArray();
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
     app.get("/blogs/recent-post", async (req, res) => {
       try {
         const result = await blogsCollection
@@ -54,6 +64,12 @@ async function run() {
         res.send(result);
       } catch {}
     });
+    app.get("/categories", async (req, res) => {
+      try {
+        const result = await blogsCollection.find().toArray();
+        res.send(result);
+      } catch {}
+    });
 
     // get comments
 
@@ -63,6 +79,17 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.log(error);
+      }
+    });
+
+    app.get("/comments/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await commentsCollection.findOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error(error);
       }
     });
 
@@ -89,6 +116,23 @@ async function run() {
       } catch (error) {
         console.error(error);
       }
+    });
+
+    // update method.....
+
+    app.put("/blogs/:id", async (req, res) => {
+      const id = { _id: new ObjectId(req.params.id) };
+      const body = req.body;
+      const updateData = {
+        $set: {
+          ...body,
+        },
+      };
+
+      const option = { upsert: true };
+      const result = await blogsCollection.updateOne(id, updateData, option);
+      console.log(body);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
