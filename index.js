@@ -37,10 +37,20 @@ async function run() {
 
     app.get("/blogs", async (req, res) => {
       try {
-        const result = await blogsCollection.find().toArray();
+        let query = {}; // Default query to fetch all blogs
+
+        if (req.query?.category) {
+          // If a category parameter is provided, filter by category
+          query = { category: req.query.category };
+        }
+
+        console.log(query);
+
+        const result = await blogsCollection.find(query).toArray();
         res.send(result);
       } catch (error) {
         console.error(error);
+        res.status(500).send("Error fetching blogs");
       }
     });
 
