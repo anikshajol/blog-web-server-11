@@ -11,7 +11,10 @@ const cookieParser = require("cookie-parser");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://majestic-custard-3f8211.netlify.app",
+    ],
     credentials: true,
   })
 );
