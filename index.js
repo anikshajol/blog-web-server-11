@@ -4,10 +4,16 @@ const cors = require("cors");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 // middleware
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // mongodb
@@ -33,6 +39,30 @@ async function run() {
     const categoryCollection = client.db("blogsDB").collection("categories");
     const wishListCollection = client.db("blogsDB").collection("wishList");
 
+    // jwt
+
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      console.log("user of token", user);
+
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ Success: true });
+    });
+
+    app.post("/logout", async (req, res) => {
+      const user = req.body;
+      console.log("logging out", user);
+      res.clearCookie("token", { maxAge: 0 }).send({ Success: true });
+    });
+
     // get method
 
     app.get("/blogs", async (req, res) => {
@@ -44,7 +74,7 @@ async function run() {
           query = { category: req.query.category };
         }
 
-        console.log(query);
+        // console.log(query);
 
         const result = await blogsCollection.find(query).toArray();
         res.send(result);
