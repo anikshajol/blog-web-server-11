@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 // middleware
 
@@ -15,6 +16,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser());
 
 // mongodb
 
@@ -28,6 +30,30 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+// middleware
+const logger = (req, res, next) => {
+  console.log("log: info", req.method, req.url);
+  next();
+};
+
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+  console.log("token in the middleware", token);
+  if (!token) {
+    return res.status(401).send({ Message: "Unauthorized access" });
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ Message: "Unauthorized access" });
+    }
+    req.user = decoded;
+    next();
+  });
+
+  // next();
+};
 
 async function run() {
   try {
@@ -65,9 +91,10 @@ async function run() {
 
     // get method
 
-    app.get("/blogs", async (req, res) => {
+    app.get("/blogs", logger, verifyToken, async (req, res) => {
       try {
-        let query = {}; // Default query to fetch all blogs
+        // console.log("cok cok cokies", req.cookies);
+        let query = {};
 
         if (req.query?.category) {
           // If a category parameter is provided, filter by category
@@ -88,6 +115,7 @@ async function run() {
 
     app.get("/blogs/recent-post", async (req, res) => {
       try {
+        // console.log("cok col", req.cookies);
         const result = await blogsCollection
           .find()
           .sort({ time: -1 })
@@ -100,7 +128,7 @@ async function run() {
       }
     });
 
-    app.get("/blogs/:id", async (req, res) => {
+    app.get("/blogs/:id", logger, verifyToken, async (req, res) => {
       try {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
@@ -108,8 +136,9 @@ async function run() {
         res.send(result);
       } catch {}
     });
-    app.get("/categories", async (req, res) => {
+    app.get("/categories", logger, verifyToken, async (req, res) => {
       try {
+        // console.log("cok cok", req.cookies);
         const result = await categoryCollection.find().toArray();
         res.send(result);
       } catch {}
@@ -117,9 +146,16 @@ async function run() {
 
     // get wishlist
 
-    app.get("/wishlist", async (req, res) => {
+    app.get("/wishlist", logger, verifyToken, async (req, res) => {
       try {
+        console.log("cok cok", req.user);
+
+        if (req.user?.email != req.query.email) {
+          return res.status(403).send({ Message: "Forbidden access" });
+        }
+
         let query = {};
+
         if (req.query?.email) {
           query = { email: req.query.email };
         }
@@ -132,7 +168,7 @@ async function run() {
 
     // get comments
 
-    app.get("/comments", async (req, res) => {
+    app.get("/comments", logger, verifyToken, async (req, res) => {
       try {
         const result = await commentsCollection.find().toArray();
         res.send(result);
@@ -141,7 +177,7 @@ async function run() {
       }
     });
 
-    app.get("/comments/:id", async (req, res) => {
+    app.get("/comments/:id", logger, verifyToken, async (req, res) => {
       try {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
