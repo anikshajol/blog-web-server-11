@@ -12,13 +12,21 @@ const cookieParser = require("cookie-parser");
 app.use(
   cors({
     origin: [
-      // "http://localhost:5173",
-      "https://majestic-custard-3f8211.netlify.app",
-      "https://654cbb3bd9a9610b846fefbc--majestic-custard-3f8211.netlify.app/",
+      "http://localhost:5173",
+      // "https://majestic-custard-3f8211.netlify.app",
+      // "https://654cbb3bd9a9610b846fefbc--majestic-custard-3f8211.netlify.app/",
     ],
     credentials: true,
   })
 );
+// Example for Express.js
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -95,7 +103,7 @@ async function run() {
 
     // get method
 
-    app.get("/blogs", logger, verifyToken, async (req, res) => {
+    app.get("/blogs", async (req, res) => {
       try {
         // console.log("cok cok cokies", req.cookies);
         let query = {};
@@ -117,7 +125,7 @@ async function run() {
 
     //
 
-    app.get("/blogs/recent-post", async (req, res) => {
+    app.get("/blogs/recent-post", logger, async (req, res) => {
       try {
         // console.log("cok col", req.cookies);
         const result = await blogsCollection
@@ -132,7 +140,7 @@ async function run() {
       }
     });
 
-    app.get("/blogs/:id", logger, verifyToken, async (req, res) => {
+    app.get("/blogs/:id", logger, async (req, res) => {
       try {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
@@ -140,7 +148,7 @@ async function run() {
         res.send(result);
       } catch {}
     });
-    app.get("/categories", logger, verifyToken, async (req, res) => {
+    app.get("/categories", logger, async (req, res) => {
       try {
         // console.log("cok cok", req.cookies);
         const result = await categoryCollection.find().toArray();
@@ -150,7 +158,7 @@ async function run() {
 
     // get wishlist
 
-    app.get("/wishlist", logger, verifyToken, async (req, res) => {
+    app.get("/wishlist", async (req, res) => {
       try {
         // console.log("cok cok", req.user);
 
@@ -172,7 +180,7 @@ async function run() {
 
     // get comments
 
-    app.get("/comments", logger, verifyToken, async (req, res) => {
+    app.get("/comments", async (req, res) => {
       try {
         const result = await commentsCollection.find().toArray();
         res.send(result);
