@@ -12,7 +12,7 @@ const cookieParser = require("cookie-parser");
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
+      "https://blog-web-6c715.web.app",
       // "https://majestic-custard-3f8211.netlify.app",
       // "https://654cbb3bd9a9610b846fefbc--majestic-custard-3f8211.netlify.app/",
     ],
@@ -162,7 +162,7 @@ async function run() {
       try {
         // console.log("cok cok", req.user);
 
-        if (req.user?.email != req.query.email) {
+        if (req.user.email != req.query.email) {
           return res.status(403).send({ Message: "Forbidden access" });
         }
 
@@ -171,6 +171,7 @@ async function run() {
         if (req.query?.email) {
           query = { email: req.query.email };
         }
+        console.log(query);
         const result = await wishListCollection.find(query).toArray();
         res.send(result);
       } catch (error) {
