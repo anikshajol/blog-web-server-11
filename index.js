@@ -125,7 +125,7 @@ async function run() {
 
     //
 
-    app.get("/blogs/recent-post", logger, async (req, res) => {
+    app.get("/blogs/recent-post", async (req, res) => {
       try {
         // console.log("cok col", req.cookies);
         const result = await blogsCollection
