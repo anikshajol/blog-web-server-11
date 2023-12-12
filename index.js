@@ -13,7 +13,8 @@ app.use(
   cors({
     origin: [
       // "https://blog-web-6c715.web.app",
-      "http://localhost:5173",
+      "https://blog-web-6c715.web.app",
+      // "http://localhost:5173",
     ],
     credentials: true,
   })
