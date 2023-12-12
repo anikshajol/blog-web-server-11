@@ -12,20 +12,19 @@ const cookieParser = require("cookie-parser");
 app.use(
   cors({
     origin: [
-      "https://blog-web-6c715.web.app",
-      // "https://majestic-custard-3f8211.netlify.app",
-      // "https://654cbb3bd9a9610b846fefbc--majestic-custard-3f8211.netlify.app/",
+      // "https://blog-web-6c715.web.app",
+      "http://localhost:5173",
     ],
     credentials: true,
   })
 );
 // Example for Express.js
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+//   next();
+// });
 
 app.use(express.json());
 app.use(cookieParser());
@@ -89,7 +88,7 @@ async function run() {
       res
         .cookie("token", token, {
           httpOnly: true,
-          secure: true,
+          secure: false,
           sameSite: "none",
         })
         .send({ Success: true });
@@ -162,9 +161,9 @@ async function run() {
       try {
         // console.log("cok cok", req.user);
 
-        if (req.user.email != req.query.email) {
-          return res.status(403).send({ Message: "Forbidden access" });
-        }
+        // if (req.user.email != req.query.email) {
+        //   return res.status(403).send({ Message: "Forbidden access" });
+        // }
 
         let query = {};
 
